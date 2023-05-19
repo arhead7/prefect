@@ -137,6 +137,10 @@ class OrchestrationResult(schemas.responses.OrchestrationResult.subclass()):
     state: Optional[State]
 
 
+class WorkQueue(schemas.core.WorkQueue.subclass()):
+    work_pool_name: Optional[str] = Field(default=None)
+
+
 class Workspace(PrefectBaseModel):
     """
     A Prefect Cloud workspace.

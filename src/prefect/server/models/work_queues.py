@@ -75,6 +75,7 @@ async def create_work_queue(
 
     session.add(model)
     await session.flush()
+    await session.refresh(model)
 
     return model
 

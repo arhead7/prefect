@@ -17,7 +17,7 @@ import prefect.server.schemas as schemas
 import prefect.settings
 import prefect.states
 from prefect._internal.compatibility.deprecated import deprecated_callable
-from prefect.client.schemas import FlowRun, OrchestrationResult, TaskRun
+from prefect.client.schemas import FlowRun, OrchestrationResult, TaskRun, WorkQueue
 from prefect.deprecated.data_documents import DataDocument
 from prefect.logging import get_logger
 from prefect.server.schemas.actions import (
@@ -35,7 +35,6 @@ from prefect.server.schemas.core import (
     FlowRunNotificationPolicy,
     QueueFilter,
     WorkPool,
-    WorkQueue,
 )
 from prefect.server.schemas.filters import (
     FlowRunNotificationPolicyFilter,
@@ -777,7 +776,7 @@ class PrefectClient:
         concurrency_limit: Optional[int] = None,
         priority: Optional[int] = None,
         work_pool_name: Optional[str] = None,
-    ) -> schemas.core.WorkQueue:
+    ) -> WorkQueue:
         """
         Create a work queue.
 
@@ -796,7 +795,7 @@ class PrefectClient:
             httpx.RequestError: If request fails
 
         Returns:
-            UUID: The UUID of the newly created workflow
+            The created work queue
         """
         if tags:
             warnings.warn(
@@ -834,13 +833,13 @@ class PrefectClient:
                 raise prefect.exceptions.ObjectNotFound(http_exc=e) from e
             else:
                 raise
-        return schemas.core.WorkQueue.parse_obj(response.json())
+        return WorkQueue.parse_obj(response.json())
 
     async def read_work_queue_by_name(
         self,
         name: str,
         work_pool_name: Optional[str] = None,
-    ) -> schemas.core.WorkQueue:
+    ) -> WorkQueue:
         """
         Read a work queue by name.
 
@@ -854,7 +853,7 @@ class PrefectClient:
             httpx.HTTPStatusError: other status errors
 
         Returns:
-            schemas.core.WorkQueue: a work queue API object
+            WorkQueue: a work queue API object
         """
         try:
             if work_pool_name is not None:
@@ -869,7 +868,7 @@ class PrefectClient:
             else:
                 raise
 
-        return schemas.core.WorkQueue.parse_obj(response.json())
+        return WorkQueue.parse_obj(response.json())
 
     async def update_work_queue(self, id: UUID, **kwargs):
         """
@@ -940,7 +939,7 @@ class PrefectClient:
     async def read_work_queue(
         self,
         id: UUID,
-    ) -> schemas.core.WorkQueue:
+    ) -> WorkQueue:
         """
         Read a work queue.
 
@@ -961,12 +960,12 @@ class PrefectClient:
                 raise prefect.exceptions.ObjectNotFound(http_exc=e) from e
             else:
                 raise
-        return schemas.core.WorkQueue.parse_obj(response.json())
+        return WorkQueue.parse_obj(response.json())
 
     async def match_work_queues(
         self,
         prefixes: List[str],
-    ) -> List[schemas.core.WorkQueue]:
+    ) -> List[WorkQueue]:
         """
         Query the Prefect API for work queues with names with a specific prefix.
 
@@ -2228,7 +2227,7 @@ class PrefectClient:
         work_queue_filter: Optional[WorkQueueFilter] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-    ) -> List[schemas.core.WorkQueue]:
+    ) -> List[WorkQueue]:
         """
         Retrieves queues for a work pool.
 
